@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="fr">
+        <!-- Bibliothèques pour générer le PDF -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    </head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire V.A.L.E.U.R©</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-bg-1: rgba(59, 130, 246, 0.08);
+            --color-bg-2: rgba(245, 158, 11, 0.08);
+            --color-bg-3: rgba(34, 197, 94, 0.08);
+            --color-bg-4: rgba(239, 68, 68, 0.08);
+            --color-bg-5: rgba(147, 51, 234, 0.08);
+            --color-bg-6: rgba(249, 115, 22, 0.08);
+            --color-bg-7: rgba(236, 72, 153, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-cream-50);
+            color: var(--color-slate-900);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--color-gray-200);
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-teal-500);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .section {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: var(--color-slate-900);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .color-red { background: var(--color-bg-4); }
+        .color-orange { background: var(--color-bg-6); }
+        .color-yellow { background: var(--color-bg-2); }
+        .color-green { background: var(--color-bg-3); }
+        .color-blue { background: var(--color-bg-1); }
+        .color-indigo { background: var(--color-bg-5); }
+        .color-violet { background: var(--color-bg-7); }
+
+        .section-subtitle {
+            color: var(--color-slate-500);
+            margin-bottom: 30px;
+            font-size: 1.05em;
+        }
+
+        .demographics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--color-cream-100);
+            border-radius: 8px;
+        }
+
+        .demographic-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .demographic-field label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--color-slate-900);
+        }
+
+        .demographic-field input,
+        .demographic-field select {
+            padding: 12px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .item-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--color-cream-100);
+            border-radius: 8px;
+            border-left: 4px solid var(--color-teal-500);
+        }
+
+        .item-number {
+            font-weight: 600;
+            color: var(--color-teal-600);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .item-text {
+            font-size: 1.05em;
+            color: var(--color-slate-900);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .scale-container {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scale-label {
+            font-size: 0.85em;
+            color: var(--color-slate-500);
+            text-align: center;
+            flex: 1;
+        }
+
+        .scale-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scale-option input[type="radio"] {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            accent-color: var(--color-teal-500);
+        }
+
+        .scale-option input[type="radio"]:hover {
+            transform: scale(1.2);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 14px 30px;
+            font-size: 1.05em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--color-teal-500);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-teal-600);
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--color-gray-300);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--color-gray-200);
+            color: var(--color-slate-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-gray-300);
+        }
+
+        .instructions {
+            background: var(--color-bg-1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--color-teal-500);
+        }
+
+        .instructions h3 {
+            color: var(--color-teal-600);
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            margin-bottom: 8px;
+            color: var(--color-slate-900);
+        }
+
+        .results-header {
+            background: var(--color-teal-500);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .results-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .score-card {
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid;
+        }
+
+        .score-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .score-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .score-level {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--color-gray-200);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .red { background: linear-gradient(135deg, var(--color-bg-4), var(--color-red-500)); border-color: #ef4444; }
+        .orange { background: linear-gradient(135deg, var(--color-bg-6), #f97316); border-color: #f97316; }
+        .yellow { background: linear-gradient(135deg, var(--color-bg-2), #eab308); border-color: #eab308; }
+        .green { background: linear-gradient(135deg, var(--color-bg-3), #22c55e); border-color: #22c55e; }
+        .blue { background: linear-gradient(135deg, var(--color-bg-1), #3b82f6); border-color: #3b82f6; }
+        .indigo { background: linear-gradient(135deg, var(--color-bg-5), #8b5cf6); border-color: #8b5cf6; }
+        .violet { background: linear-gradient(135deg, var(--color-bg-7), #ec4899); border-color: #ec4899; }
+
+        .portrait-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .portrait-section h3 {
+            color: var(--color-teal-600);
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .portrait-text {
+            color: var(--color-slate-900);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .critical-items {
+            background: var(--color-bg-4);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--color-red-500);
+        }
+
+        .critical-items h4 {
+            color: var(--color-red-500);
+            margin-bottom: 10px;
+        }
+
+        .critical-items ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .critical-items li {
+            padding: 8px 0;
+            color: var(--color-slate-900);
+        }
+
+        .critical-items li:before {
+            content: "⚠ ";
+            color: var(--color-red-500);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .resources-items {
+            background: var(--color-bg-3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+
+        .resources-items h4 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .resources-items ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .resources-items li {
+            padding: 8px 0;
+            color: var(--color-slate-900);
+        }
+
+        .resources-items li:before {
+            content: "✓ ";
+            color: #22c55e;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .phase {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-teal-500);
+        }
+
+        .phase-title {
+            font-weight: 600;
+            color: var(--color-teal-600);
+            margin-bottom: 8px;
+        }
+
+        .phase-content {
+            color: var(--color-slate-900);
+            font-size: 0.95em;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            padding: 12px 25px;
+            background: var(--color-teal-500);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-export:hover {
+            background: var(--color-teal-600);
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .demographics {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .scores-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scale-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎭 Méthode V.A.L.E.U.R©</h1>
+            <header>
+                <h1>🎭 Questionnaire V.A.L.E.U.R©</h1>
+                <p>Identification des Stratégies de Protection Psychologique</p>
+            </header>
+
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="section active" id="section-welcome">
+            <h2 style="text-align: center; margin-bottom: 30px;">Bienvenue</h2>
+            <div class="instructions">
+                <h3>📋 À propos de ce questionnaire</h3>
+                <p>Ce questionnaire explore les <strong>7 masques psychologiques</strong> que nous développons pour nous protéger face aux blessures émotionnelles.</p>
+                <p>Chaque masque correspond à une peur primale et une stratégie d'adaptation spécifique.</p>
+                <p><strong>Durée estimée:</strong> 40 à 50 minutes</p>
+            </div>
+
+            <div class="demographics">
+                <div class="demographic-field">
+                    <label for="prenom">Prénom / Initiales (confidentiel):</label>
+                    <input type="text" id="prenom" placeholder="Ex: J.D.">
+                </div>
+                <div class="demographic-field">
+                    <label for="age">Âge:</label>
+                    <input type="number" id="age" min="18" max="120">
+                </div>
+                <div class="demographic-field">
+                    <label for="genre">Genre:</label>
+                    <select id="genre">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="feminin">Féminin</option>
+                        <option value="masculin">Masculin</option>
+                        <option value="autre">Autre</option>
+                        <option value="prefer">Préfère ne pas dire</option>
+                    </select>
+                </div>
+                <div class="demographic-field">
+                    <label for="situation">Situation professionnelle:</label>
+                    <select id="situation">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="salarie">Salarié(e)</option>
+                        <option value="independant">Indépendant(e)</option>
+                        <option value="sans-emploi">Sans emploi</option>
+                        <option value="etudiant">Étudiant(e)</option>
+                        <option value="retraite">Retraité(e)</option>
+                    </select>
+                </div>
+                <div class="demographic-field">
+                    <label for="attachement">Style d'attachement présumé:</label>
+                    <select id="attachement">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="securise">Sécurisé</option>
+                        <option value="anxieux">Anxieux-ambivalent</option>
+                        <option value="evitant">Évitant</option>
+                        <option value="desorganise">Désorganisé</option>
+                        <option value="incertain">Incertain</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn-primary" onclick="startQuestionnaire()">Commencer le questionnaire →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-red">
+            <div class="section-title">
+                <div class="section-icon color-red">🔴</div>
+                <div>
+                    <div>MASQUE ROUGE</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Anxiété de Santé • Hypervigilance Somatique • Peur Existentielle</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Surveilles-tu constamment ta santé ou tes sensations corporelles?</p>
+            <div id="items-red"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-orange">
+            <div class="section-title">
+                <div class="section-icon color-orange">🟠</div>
+                <div>
+                    <div>MASQUE ORANGE</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Alexithymie • Évitement Émotionnel • Dissociation Affective</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Éprouves-tu des difficultés à identifier ou exprimer tes émotions?</p>
+            <div id="items-orange"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-yellow">
+            <div class="section-title">
+                <div class="section-icon color-yellow">🟡</div>
+                <div>
+                    <div>MASQUE JAUNE</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Intolérance à l'Incertitude • Besoin de Contrôle • Rigidité Cognitive</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Planifies-tu excessivement et as-tu du mal avec l'imprévu?</p>
+            <div id="items-yellow"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-green">
+            <div class="section-title">
+                <div class="section-icon color-green">🟢</div>
+                <div>
+                    <div>MASQUE VERT</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Anxiété de Séparation • Dépendance Affective • Peur de l'Abandon</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Crains-tu le rejet et as-tu du mal à affirmer tes besoins?</p>
+            <div id="items-green"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-blue">
+            <div class="section-title">
+                <div class="section-icon color-blue">🔵</div>
+                <div>
+                    <div>MASQUE BLEU</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Hypercontrôle • Besoin de Domination • Intolérance à la Dépendance</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Éprouves-tu un besoin de contrôle et de domination?</p>
+            <div id="items-blue"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-indigo">
+            <div class="section-title">
+                <div class="section-icon color-indigo">🟣</div>
+                <div>
+                    <div>MASQUE INDIGO</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Perfectionnisme • Syndrome de l'Imposteur • Peur de l'Inadéquation</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Doutes-tu de ta compétence malgré tes succès?</p>
+            <div id="items-indigo"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="nextSection()">Suivant →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-violet">
+            <div class="section-title">
+                <div class="section-icon color-violet">⚫</div>
+                <div>
+                    <div>MASQUE VIOLET</div>
+                    <div style="font-size: 0.7em; color: var(--color-slate-500);">Aliénation Identitaire • Faux-Self • Crise Existentielle</div>
+                </div>
+            </div>
+            <p class="section-subtitle">Ne sais-tu plus qui tu es vraiment?</p>
+            <div id="items-violet"></div>
+            <div class="buttons">
+                <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                <button class="btn-primary" onclick="finishQuestionnaire()">Voir mes résultats →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-results">
+            <div class="results-header">
+                <h2>📊 Vos Résultats Personnalisés</h2>
+                <p id="result-date"></p>
+            </div>
+
+            <div class="scores-grid" id="scores-container"></div>
+
+            <div class="portrait-section">
+                <h3>🎯 Votre Portrait Psychologique Global</h3>
+                <div id="portrait-global"></div>
+            </div>
+
+            <div class="portrait-section">
+                <h3>⚠️ Domaines Prioritaires d'Intervention</h3>
+                <div id="critical-analysis"></div>
+            </div>
+
+            <div class="portrait-section">
+                <h3>💪 Vos Ressources Existantes</h3>
+                <div id="resources-analysis"></div>
+            </div>
+
+            <div class="portrait-section">
+                <h3>🛤️ Plan Thérapeutique Recommandé</h3>
+                <div id="therapeutic-plan"></div>
+            </div>
+
+            <div class="portrait-section">
+                <h3>📈 Interprétations Détaillées par Masque</h3>
+                <div id="detailed-interpretations"></div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportPDF()">📄 Télécharger le rapport PDF</button>
+
+                <button class="btn-export" onclick="resetQuestionnaire()">🔄 Recommencer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questionnaire = {
+            red: {
+                name: "MASQUE ROUGE",
+                color: "red",
+                fear: "La mort / Maladie",
+                items: [
+                    { id: "R1", text: "Je surveille constamment mes battements cardiaques, ma respiration ou ma température corporelle", inverted: false },
+                    { id: "R_inv1", text: "Je fais confiance à mon corps et à sa capacité autorégulative de maintien de la santé", inverted: true },
+                    { id: "R2", text: "Lorsque je ressens une sensation corporelle inhabituelle, j'anticipe immédiatement le pire diagnostic", inverted: false },
+                    { id: "R_inv2", text: "Lorsque je ressens une sensation physique mineure, j'évalue qu'elle est probablement bénigne", inverted: true },
+                    { id: "R3", text: "Je recherche mes symptômes en ligne ou consulte des sources médicales pour auto-diagnostiquer mes maux", inverted: false },
+                    { id: "R_inv3", text: "Je peux pratiquer une activité physique sans préoccupation excessive concernant ma santé", inverted: true },
+                    { id: "R4", text: "J'évite certaines activités physiques (escaliers, sport, transports) par appréhension qu'un événement grave survienne", inverted: false },
+                    { id: "R_inv4", text: "Je suis rarement préoccupé(e) par ma santé ou par l'émergence potentielle de pathologies", inverted: true },
+                    { id: "R5", text: "Je me réveille la nuit avec une angoisse concernant ma santé ou mon intégrité physique", inverted: false },
+                    { id: "R6", text: "J'ai besoin d'une réassurance répétée de professionnels médicaux ou de mes proches concernant ma santé", inverted: false },
+                    { id: "R7", text: "La moindre douleur corporelle déclenche immédiatement des pensées de maladie grave (cancer, infarctus, AVC)", inverted: false },
+                    { id: "R8", text: "J'ai consulté plusieurs médecins pour un même symptôme car aucune réassurance n'a été suffisante", inverted: false },
+                    { id: "R9", text: "J'éprouve une peur récurrente de mourir subitement (arrêt cardiaque, accident vasculaire) sans signe avant-coureur", inverted: false },
+                    { id: "R10", text: "Je réalise des bilans de santé très réguliers, même en l'absence de symptomatologie particulière", inverted: false },
+                    { id: "R11", text: "Les reportages ou informations sur des pathologies graves me concernent personnellement et génèrent de l'anxiété", inverted: false },
+                    { id: "R12", text: "J'ai des difficultés de concentration car mon attention est captée par mes sensations corporelles", inverted: false }
+                ]
+            },
+            orange: {
+                name: "MASQUE ORANGE",
+                color: "orange",
+                fear: "La douleur / Souffrance",
+                items: [
+                    { id: "O1", text: "Je change de sujet ou me retire lorsqu'une conversation devient trop chargée émotionnellement", inverted: false },
+                    { id: "O_inv1", text: "Je ressens et identifie clairement mes différents états émotionnels", inverted: true },
+                    { id: "O2", text: "Je ressens un malaise significatif lorsqu'autrui pleure ou exprime des émotions intenses en ma présence", inverted: false },
+                    { id: "O_inv2", text: "L'intimité émotionnelle avec autrui me semble naturelle et confortable", inverted: true },
+                    { id: "O3", text: "J'éprouve des difficultés à identifier et nommer précisément ce que je ressens (peur, colère, tristesse, joie)", inverted: false },
+                    { id: "O_inv3", text: "J'ai pleuré récemment et ai pu exprimer authentiquement ce que je ressentais", inverted: true },
+                    { id: "O4", text: "Je maintiens un niveau d'activité constant pour éviter de me retrouver seul(e) avec mes émotions", inverted: false },
+                    { id: "O_inv4", text: "Mon corps me semble vivant, habité et connecté à mes émotions", inverted: true },
+                    { id: "O5", text: "J'utilise l'humour ou la dérision comme mécanisme d'évitement face aux situations émotionnellement difficiles", inverted: false },
+                    { id: "O6", text: "Je me sens émotionnellement engourdi(e), comme si j'observais ma propre vie de l'extérieur", inverted: false },
+                    { id: "O7", text: "J'évite délibérément les films, lectures ou situations susceptibles de m'émouvoir intensément", inverted: false },
+                    { id: "O8", text: "Je n'ai pas pleuré depuis une période prolongée, même lors d'événements objectivement difficiles", inverted: false },
+                    { id: "O9", text: "Je minimise systématiquement mes difficultés en répondant « ça va » même en situation de détresse", inverted: false },
+                    { id: "O10", text: "J'utilise le travail, les substances, les écrans ou d'autres activités pour anesthésier mes ressentis", inverted: false },
+                    { id: "O11", text: "Mon entourage me perçoit comme émotionnellement distant(e), froid(e) ou manquant d'empathie", inverted: false },
+                    { id: "O12", text: "Je me sens déconnecté(e) de mon corps et de ses manifestations sensorielles", inverted: false }
+                ]
+            },
+            yellow: {
+                name: "MASQUE JAUNE",
+                color: "yellow",
+                fear: "L'inconnu / Incertitude",
+                items: [
+                    { id: "J1", text: "Je planifie excessivement chaque aspect de mon existence pour anticiper et prévenir les imprévus", inverted: false },
+                    { id: "J_inv1", text: "J'apprécie l'imprévu et les surprises, même lorsqu'elles sont inattendues", inverted: true },
+                    { id: "J2", text: "L'incertitude ou l'absence d'information sur ce qui va advenir génère une anxiété considérable", inverted: false },
+                    { id: "J_inv2", text: "Je peux prendre des décisions sans disposer de toutes les informations", inverted: true },
+                    { id: "J3", text: "Je vérifie de manière répétée mes actions (fermetures, appareils, communications) pour m'assurer de leur exactitude", inverted: false },
+                    { id: "J_inv3", text: "Je suis flexible et peux aisément adapter mes plans face aux circonstances", inverted: true },
+                    { id: "J4", text: "Les modifications de planification ou d'horaire, même mineures, déclenchent un stress significatif", inverted: false },
+                    { id: "J_inv4", text: "L'incertitude ne constitue pas une source d'anxiété significative pour moi", inverted: true },
+                    { id: "J5", text: "J'ai développé des routines rigides et leur modification me perturbe profondément", inverted: false },
+                    { id: "J6", text: "Je rumine constamment sur l'ensemble des scénarios possibles et leurs conséquences potentielles", inverted: false },
+                    { id: "J7", text: "J'ai besoin d'une quantité importante d'informations avant de prendre même une décision mineure", inverted: false },
+                    { id: "J8", text: "Les surprises, même positives ou agréables, génèrent un inconfort psychologique", inverted: false },
+                    { id: "J9", text: "Je prépare systématiquement plusieurs plans alternatifs (B, C, D) pour toute situation", inverted: false },
+                    { id: "J10", text: "Les environnements nouveaux ou peu prévisibles déclenchent une anxiété intense", inverted: false },
+                    { id: "J11", text: "Je suis très rigide dans mes méthodes et résiste à l'expérimentation de nouvelles approches", inverted: false },
+                    { id: "J12", text: "L'idée d'improviser ou d'adopter une posture de « on verra bien » m'angoisse profondément", inverted: false }
+                ]
+            },
+            green: {
+                name: "MASQUE VERT",
+                color: "green",
+                fear: "Le rejet / Abandon",
+                items: [
+                    { id: "V1", text: "J'acquiesce à la majorité des demandes, même lorsque je n'en ai authentiquement pas l'envie", inverted: false },
+                    { id: "V_inv1", text: "Je peux affirmer mes besoins authentiques sans crainte excessive du rejet", inverted: true },
+                    { id: "V2", text: "Un message sans réponse rapide déclenche une anxiété et une rumination importantes", inverted: false },
+                    { id: "V_inv2", text: "Je suis à l'aise et serein(e) dans la solitude", inverted: true },
+                    { id: "V3", text: "J'adapte ma personnalité, mes opinions et mes préférences en fonction de mon interlocuteur", inverted: false },
+                    { id: "V_inv3", text: "Je sais poser des limites et dire « non » lorsque quelque chose ne me convient pas", inverted: true },
+                    { id: "V4", text: "Je suis incapable d'affirmer mes besoins ou désirs authentiques par crainte de générer un conflit", inverted: false },
+                    { id: "V_inv4", text: "Je me sens aimé(e) et accepté(e) pour qui je suis authentiquement", inverted: true },
+                    { id: "V5", text: "J'ai besoin d'une réassurance constante concernant l'affection et l'acceptation d'autrui à mon égard", inverted: false },
+                    { id: "V6", text: "Je maintiens des relations insatisfaisantes ou délétères par peur de me retrouver seul(e)", inverted: false },
+                    { id: "V7", text: "Je me surcharge de responsabilités pour me rendre indispensable et garantir ma place", inverted: false },
+                    { id: "V8", text: "La solitude représente une terreur profonde et je déploie tous les moyens pour l'éviter", inverted: false },
+                    { id: "V9", text: "J'analyse constamment les comportements d'autrui à la recherche d'indices de rejet potentiel", inverted: false },
+                    { id: "V10", text: "J'éprouve des difficultés majeures à exprimer un désaccord ou une perspective divergente par peur du jugement", inverted: false },
+                    { id: "V11", text: "Je m'efface systématiquement et sacrifie mes propres besoins pour le confort relationnel d'autrui", inverted: false },
+                    { id: "V12", text: "Une critique, même constructive, me blesse profondément et je la rumine longuement", inverted: false }
+                ]
+            },
+            blue: {
+                name: "MASQUE BLEU",
+                color: "blue",
+                fear: "L'impuissance",
+                items: [
+                    { id: "B1", text: "Je reprends immédiatement le contrôle ou corrige autrui lorsque les choses sont réalisées différemment", inverted: false },
+                    { id: "B_inv1", text: "Je peux facilement déléguer et faire confiance aux compétences d'autrui", inverted: true },
+                    { id: "B2", text: "Déléguer m'est extrêmement difficile car je suis convaincu(e) qu'autrui ne fera pas aussi bien", inverted: false },
+                    { id: "B_inv2", text: "Lorsque les événements m'échappent, je maintiens ma sérénité intérieure", inverted: true },
+                    { id: "B3", text: "Je ressens une irritation viscérale et profonde lorsque les événements m'échappent", inverted: false },
+                    { id: "B_inv3", text: "J'accueille les critiques et les perspectives divergentes avec ouverture", inverted: true },
+                    { id: "B4", text: "J'ai des réactions de colère disproportionnées face à la perte de contrôle d'une situation", inverted: false },
+                    { id: "B_inv4", text: "Je n'ai pas besoin d'être en position dominante ou de contrôle pour me sentir en sécurité", inverted: true },
+                    { id: "B5", text: "Je suis très susceptible et réagis intensément à toute forme de critique, même constructive", inverted: false },
+                    { id: "B6", text: "J'ai un besoin significatif d'être reconnu(e), admiré(e) ou d'occuper une position d'influence", inverted: false },
+                    { id: "B7", text: "Je ressens une anxiété majeure ou un sentiment d'impuissance lorsque je dois dépendre d'autrui", inverted: false },
+                    { id: "B8", text: "Je tends à diriger, organiser et prendre les décisions pour les autres, même sans sollicitation", inverted: false },
+                    { id: "B9", text: "Mon entourage me décrit comme contrôlant(e), directif(ve) ou difficile dans les relations", inverted: false },
+                    { id: "B10", text: "Je tolère très difficilement qu'on me dicte ma conduite ou mes choix", inverted: false },
+                    { id: "B11", text: "J'épuise mon entourage en portant l'ensemble des responsabilités et en refusant l'aide", inverted: false },
+                    { id: "B12", text: "L'idée d'être dans une position d'impuissance ou sans influence me terrifie profondément", inverted: false }
+                ]
+            },
+            indigo: {
+                name: "MASQUE INDIGO",
+                color: "indigo",
+                fear: "L'échec / Insuffisance",
+                items: [
+                    { id: "I1", text: "Je procrastine ou diffère mes actions par crainte que mon travail ne soit pas suffisamment parfait", inverted: false },
+                    { id: "I_inv1", text: "Je reconnais et valorise mes accomplissements avec fierté", inverted: true },
+                    { id: "I2", text: "Je minimise systématiquement mes accomplissements et mes succès", inverted: false },
+                    { id: "I_inv2", text: "Je peux entreprendre de nouvelles activités même sans garantie de perfection", inverted: true },
+                    { id: "I3", text: "J'éprouve le sentiment profond d'être un(e) imposteur(e) qui a bénéficié de chance jusqu'à présent", inverted: false },
+                    { id: "I_inv3", text: "Je me sens compétent(e) et légitime dans mes domaines d'expertise", inverted: true },
+                    { id: "I4", text: "Je me compare constamment à autrui et me perçois toujours comme inférieur(e) ou insuffisant(e)", inverted: false },
+                    { id: "I_inv4", text: "Une erreur représente pour moi une opportunité d'apprentissage, non une remise en cause de ma valeur", inverted: true },
+                    { id: "I5", text: "Je retravaille excessivement mes productions car elles ne sont jamais assez abouties pour être partagées", inverted: false },
+                    { id: "I6", text: "J'évite de relever des défis, de prendre des initiatives ou d'expérimenter de nouvelles compétences", inverted: false },
+                    { id: "I7", text: "Une erreur mineure me fait intensément douter de ma compétence globale et de ma valeur", inverted: false },
+                    { id: "I8", text: "J'ai un besoin constant de validation externe pour me sentir compétent(e) et légitime", inverted: false },
+                    { id: "I9", text: "Je sabote inconsciemment mes propres réussites lorsqu'elles deviennent trop significatives", inverted: false },
+                    { id: "I10", text: "La perspective de décevoir autrui me paralyse et m'empêche d'agir", inverted: false },
+                    { id: "I11", text: "Mon dialogue interne est sévèrement critique, punitif et auto-flagellant", inverted: false },
+                    { id: "I12", text: "Je préfère ne rien entreprendre plutôt que de risquer un échec visible publiquement", inverted: false }
+                ]
+            },
+            violet: {
+                name: "MASQUE VIOLET",
+                color: "violet",
+                fear: "Perdre son Identité",
+                items: [
+                    { id: "Vi1", text: "Je ne sais plus véritablement qui je suis en dehors des rôles sociaux que j'incarne", inverted: false },
+                    { id: "Vi_inv1", text: "Je sais clairement qui je suis indépendamment des rôles que je joue socialement", inverted: true },
+                    { id: "Vi2", text: "Lorsque je suis seul(e) et silencieux(se), j'éprouve un vide, une absence ou un manque de sens", inverted: false },
+                    { id: "Vi_inv2", text: "Je me sens vivant(e), présent(e) et pleinement impliqué(e) dans ma propre vie", inverted: true },
+                    { id: "Vi3", text: "J'ai renoncé à mes passions, aspirations et intérêts authentiques pour correspondre aux attentes externes", inverted: false },
+                    { id: "Vi_inv3", text: "J'explore librement de nouvelles facettes de ma personnalité avec curiosité", inverted: true },
+                    { id: "Vi4", text: "Si je changeais profondément, je serais dans l'incapacité d'anticiper qui je deviendrais", inverted: false },
+                    { id: "Vi_inv4", text: "Mon existence me semble authentique, cohérente et véritablement MIENNE", inverted: true },
+                    { id: "Vi5", text: "J'éprouve une nostalgie douloureuse de qui j'étais antérieurement, plus spontané(e) et authentique", inverted: false },
+                    { id: "Vi6", text: "Je me sens étranger(ère) à ma propre existence, comme si je l'observais de l'extérieur", inverted: false },
+                    { id: "Vi7", text: "J'ai porté tant de masques que l'idée d'être authentiquement moi-même semble terrifiante", inverted: false },
+                    { id: "Vi8", text: "Je m'accroche rigidement à mes habitudes et routines même si elles ne génèrent pas de bien-être", inverted: false },
+                    { id: "Vi9", text: "L'idée d'explorer de nouvelles facettes identitaires ou de me transformer me terrifie profondément", inverted: false },
+                    { id: "Vi10", text: "Je vis en mode automatique, sans véritable présence, choix conscient ou implication émotionnelle", inverted: false },
+                    { id: "Vi11", text: "Je refuse activement les opportunités de croissance personnelle ou de transformation par peur", inverted: false },
+                    { id: "Vi12", text: "Je me sens enfermé(e) dans ma propre construction identitaire, incapable de changer véritablement", inverted: false }
+                ]
+            }
+        };
+
+        let currentSection = "welcome";
+        let responses = {};
+
+        function initializeQuestionnaire() {
+            Object.keys(questionnaire).forEach(maskKey => {
+                const mask = questionnaire[maskKey];
+                const container = document.getElementById(`items-${maskKey}`);
+
+                mask.items.forEach((item, index) => {
+                    const itemHTML = `
+                        <div class="item-container">
+                            <div class="item-number">${item.id}</div>
+                            <div class="item-text">${item.text}</div>
+                            <div class="scale-container">
+                                <span class="scale-label">Jamais</span>
+                                ${[0,1,2,3,4].map(val => `
+                                    <div class="scale-option">
+                                        <input type="radio" name="${item.id}" value="${val}" onchange="recordResponse('${item.id}', ${val}, ${item.inverted})">
+                                        <span class="scale-label">${val}</span>
+                                    </div>
+                                `).join('')}
+                                <span class="scale-label">Très souvent</span>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += itemHTML;
+                });
+            });
+        }
+
+        function recordResponse(itemId, value, inverted) {
+            responses[itemId] = { value: parseInt(value), inverted: inverted };
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalItems = Object.keys(questionnaire).reduce((sum, key) => sum + questionnaire[key].items.length, 0);
+            const answered = Object.keys(responses).length;
+            const percentage = (answered / totalItems) * 100;
+            document.querySelector('.progress-fill').style.width = percentage + '%';
+        }
+
+        function startQuestionnaire() {
+            const prenom = document.getElementById('prenom').value;
+            if (!prenom) {
+                alert('Veuillez entrer vos initiales');
+                return;
+            }
+            showSection('red');
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${sectionId}`).classList.add('active');
+            currentSection = sectionId;
+            window.scrollTo(0, 0);
+        }
+
+        function nextSection() {
+            const sections = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+            const currentIndex = sections.indexOf(currentSection);
+            if (currentIndex < sections.length - 1) {
+                showSection(sections[currentIndex + 1]);
+            }
+        }
+
+        function previousSection() {
+            const sections = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+            const currentIndex = sections.indexOf(currentSection);
+            if (currentIndex > 0) {
+                showSection(sections[currentIndex - 1]);
+            } else {
+                showSection('welcome');
+            }
+        }
+
+        function finishQuestionnaire() {
+            const totalItems = Object.keys(questionnaire).reduce((sum, key) => sum + questionnaire[key].items.length, 0);
+            if (Object.keys(responses).length < totalItems) {
+                alert(`Veuillez répondre à toutes les questions (${Object.keys(responses).length}/${totalItems})`);
+                return;
+            }
+            calculateAndDisplayResults();
+        }
+
+        function calculateScores() {
+            const scores = {};
+
+            Object.keys(questionnaire).forEach(maskKey => {
+                let score = 0;
+                questionnaire[maskKey].items.forEach(item => {
+                    if (responses[item.id]) {
+                        let value = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            value = 4 - value;
+                        }
+                        score += value;
+                    }
+                });
+                scores[maskKey] = score;
+            });
+
+            return scores;
+        }
+
+        function getScoreLevel(score) {
+            if (score <= 16) return { level: "Faible", color: "#22c55e" };
+            if (score <= 32) return { level: "Modéré", color: "#eab308" };
+            if (score <= 48) return { level: "Élevé", color: "#f97316" };
+            return { level: "Dominant", color: "#ef4444" };
+        }
+
+        function getMaskInterpretation(maskKey, score) {
+            const interpretations = {
+                red: {
+                    low: "Vous maintenez une relation équilibrée avec votre corps et votre santé. Les sensations physiques ne déclenchent pas d'inquiétude chronique.",
+                    moderate: "Vous avez une vigilance normale à votre santé, mais certaines situations déclenchent une inquiétude accrue. Cette vigilance est adaptative si elle ne vous immobilise pas.",
+                    high: "Vous avez une surveillance constante de votre corps qui génère une anxiété significative. Les sensations mineures sont interprétées comme des signes de maladie grave.",
+                    dominant: "L'anxiété santé envahit votre vie quotidienne de façon pénalisante. Vous avez probablement consulté plusieurs médecins sans trouver de réassurance durable."
+                },
+                orange: {
+                    low: "Vous avez une bonne capacité d'identification et d'expression émotionnelle. L'intimité affective vous est accessible et confortable.",
+                    moderate: "Vous avez une capacité émotionnelle variable selon le contexte. Certaines émotions sont faciles d'accès, d'autres bloquées.",
+                    high: "Vous avez des difficultés significatives à identifier et nommer vos émotions. Il y a une déconnexion entre ce que vous ressentez physiquement et votre conscience.",
+                    dominant: "Vous avez une dissociation affective majeure : sentiment de vide, d'engourdissement. Vous observez votre vie comme de l'extérieur, sans vraie connexion."
+                },
+                yellow: {
+                    low: "Vous tolérez bien l'incertitude et l'imprévu. Vous pouvez prendre des décisions sans avoir toutes les informations.",
+                    moderate: "Vous avez une préférence pour la clarté et l'ordre, mais vous êtes adaptable. Les imprévisibilités créent un certain inconfort qui reste gérable.",
+                    high: "Vous avez un besoin marqué de prévisibilité et de contrôle de l'environnement. L'incertitude génère une anxiété significative qui pousse à sur-planifier.",
+                    dominant: "Vous êtes dans un hypercontrôle cognitif et comportemental constant. Chaque décision est paralysante faute d'informations suffisantes."
+                },
+                green: {
+                    low: "Vous pouvez affirmer vos besoins sans crainte excessive du rejet. Vous maintenez des limites saines dans vos relations.",
+                    moderate: "Vous avez une certaine capacité à affirmer vos besoins, mais cela génère de l'inconfort. Vous avez tendance à sur-adapter parfois.",
+                    high: "Vous avez des difficultés significatives à affirmer vos besoins. La peur du rejet domine vos comportements relationnels.",
+                    dominant: "Vous avez une dépendance affective majeure. La solitude représente une terreur profonde et vous sacrifiez vos propres besoins pour maintenir les relations."
+                },
+                blue: {
+                    low: "Vous tolérez facilement les situations où vous n'avez pas le contrôle. Vous faites confiance aux compétences d'autrui.",
+                    moderate: "Vous avez un besoin modéré de contrôle. Vous aimeriez que les choses se fassent selon vos préférences, mais vous êtes adaptable.",
+                    high: "Vous avez un besoin marqué de contrôle. La délégation vous est difficile et la perte de contrôle génère de la frustration.",
+                    dominant: "Vous êtes dans un besoin compulsif de contrôle et de domination. La perte de contrôle crée de l'irritation viscérale et vous tolérez mal l'impuissance."
+                },
+                indigo: {
+                    low: "Vous avez une estime de vous équilibrée. Vous acceptez les erreurs comme des opportunités d'apprentissage.",
+                    moderate: "Vous avez certains standards élevés, mais ils restent adaptés à la réalité. Vous doutez parfois mais vous pouvez avancer.",
+                    high: "Vous avez des standards irréalistes qui vous paralysent. Le perfectionnisme est une source majeure de souffrance.",
+                    dominant: "Vous avez un perfectionnisme extrême couplé au syndrome de l'imposteur. Vous sabotez vos propres succès et doutez chroniquement de votre légitimité."
+                },
+                violet: {
+                    low: "Vous avez une identité claire et authentique. Vous savez qui vous êtes indépendamment de vos rôles sociaux.",
+                    moderate: "Vous avez généralement une identité stable, mais parfois vous questionnez qui vous êtes vraiment.",
+                    high: "Vous avez des doutes significatifs sur votre identité. Vous sentez que vous jouez des rôles plutôt que d'être authentique.",
+                    dominant: "Vous avez une aliénation identitaire majeure. Vous ne savez plus qui vous êtes vraiment et vous vivez en mode automatique."
+                }
+            };
+
+            const level = getScoreLevel(score).level.toLowerCase().replace(/é|è/g, 'e');
+            const key = level === "faible" ? "low" : level === "modere" ? "moderate" : level === "eleve" ? "high" : "dominant";
+            return interpretations[maskKey][key];
+        }
+
+        function calculateAndDisplayResults() {
+            const scores = calculateScores();
+            const prenom = document.getElementById('prenom').value;
+
+            let scoresHTML = '';
+            Object.keys(questionnaire).forEach(maskKey => {
+                const mask = questionnaire[maskKey];
+                const score = scores[maskKey];
+                const level = getScoreLevel(score);
+                const percentage = (score / 64) * 100;
+
+                scoresHTML += `
+                    <div class="score-card ${maskKey}">
+                        <h3>${mask.name}</h3>
+                        <div class="score-value">${score}</div>
+                        <div class="score-level">${level.level}</div>
+                        <p style="font-size: 0.9em; color: #666; margin: 10px 0;">Peur: ${mask.fear}</p>
+                        <div class="score-bar">
+                            <div class="score-bar-fill" style="width: ${percentage}%; background: ${level.color};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('scores-container').innerHTML = scoresHTML;
+
+            const dominant = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const globalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+
+            let portraitHTML = `
+                <p class="portrait-text">
+                    <strong>Évaluation générale (score total: ${globalScore}/448):</strong><br>
+                    Vous avez un profil avec activation ${getScoreLevel(globalScore / 7).level.toLowerCase()} des mécanismes de défense.
+                </p>
+                <p class="portrait-text">
+                    <strong>Masque prédominant: ${questionnaire[dominant].name}</strong><br>
+                    ${getMaskInterpretation(dominant, scores[dominant])}
+                </p>
+                <p class="portrait-text">
+                    Votre dynamique psychologique révèle une interaction complexe entre plusieurs stratégies de protection.
+                    Le travail thérapeutique devrait d'abord se concentrer sur le masque dominant, puis explorer les interactions avec les masques secondaires.
+                </p>
+            `;
+            document.getElementById('portrait-global').innerHTML = portraitHTML;
+
+            let criticalHTML = '<div class="critical-items"><h4>Items à score maximal (4 - Très souvent)</h4><ul>';
+            let criticalCount = 0;
+            Object.keys(questionnaire).forEach(maskKey => {
+                questionnaire[maskKey].items.forEach(item => {
+                    if (responses[item.id]) {
+                        let finalValue = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            finalValue = 4 - finalValue;
+                        }
+                        if (finalValue === 4) {
+                            criticalHTML += `<li><strong>${item.id}</strong> - ${item.text}</li>`;
+                            criticalCount++;
+                        }
+                    }
+                });
+            });
+            if (criticalCount === 0) {
+                criticalHTML += '<li>Aucun item à score maximal - c\'est une excellente ressource!</li>';
+            }
+            criticalHTML += '</ul></div>';
+
+            let resourcesHTML = '<div class="resources-items"><h4>Items à score nul (0 - Jamais)</h4><ul>';
+            let resourceCount = 0;
+            Object.keys(questionnaire).forEach(maskKey => {
+                questionnaire[maskKey].items.forEach(item => {
+                    if (responses[item.id]) {
+                        let finalValue = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            finalValue = 4 - finalValue;
+                        }
+                        if (finalValue === 0) {
+                            resourcesHTML += `<li><strong>${item.id}</strong> - ${item.text}</li>`;
+                            resourceCount++;
+                        }
+                    }
+                });
+            });
+
+            if (resourceCount === 0) {
+                resourcesHTML += '<li>Peu de ressources identifiées - cela peut indiquer une activation globale des mécanismes défensifs</li>';
+            }
+            resourcesHTML += '</ul></div>';
+
+            document.getElementById('critical-analysis').innerHTML = criticalHTML;
+            document.getElementById('resources-analysis').innerHTML = resourcesHTML;
+
+            const approaches = {
+                red: "TCC anxiété liée à la santé • Restructuration cognitive • Exposition intéroceptive • Mindfulness • ACT",
+                orange: "ACT • Thérapie centrée sur émotions (EFT) • Travail alexithymie • EMDR si trauma • DBT skills",
+                yellow: "TCC TAG • ERP • Flexibilité cognitive • Mindfulness • Exposition à l'incertitude",
+                green: "Thérapie des schémas • Thérapie attachement • Affirmation de soi • Travail limites • TCC anxiété sociale",
+                blue: "Thérapie des schémas • Régulation colère (Novaco) • Empathie • ACT • Thérapie relationnelle",
+                indigo: "TCC perfectionnisme • Syndrome imposteur • Thérapie schémas • Auto-compassion • Exposition imperfection",
+                violet: "Psychothérapie existentielle • Thérapie des schémas • Exploration identitaire • Thérapie narrative • Travail vrai/faux self"
+            };
+
+            let planHTML = '';
+            const sortedMasks = Object.keys(scores).sort((a, b) => scores[b] - scores[a]).slice(0, 3);
+
+            sortedMasks.forEach((maskKey, index) => {
+                planHTML += `
+                    <div class="phase">
+                        <div class="phase-title">Masque ${questionnaire[maskKey].name} (Priorité ${index + 1})</div>
+                        <div class="phase-content">
+                            Score: ${scores[maskKey]}/64 | Approches: ${approaches[maskKey]}<br>
+                            Durée estimée: ${scores[maskKey] > 48 ? "24-40 séances" : scores[maskKey] > 32 ? "15-24 séances" : "12-16 séances"}
+                        </div>
+                    </div>
+                `;
+            });
+
+            planHTML += `
+                <div class="phase" style="background: #f0f9ff; margin-top: 20px;">
+                    <div class="phase-title">Séquençage recommandé</div>
+                    <div class="phase-content">
+                        <strong>Phase 1 (Séances 1-4):</strong> Psychoéducation, alliance, restitution<br>
+                        <strong>Phase 2 (Séances 5-12):</strong> Travail ciblé sur masques dominants<br>
+                        <strong>Phase 3 (Séances 13+):</strong> Consolidation et suivi
+                    </div>
+                </div>
+            `;
+            document.getElementById('therapeutic-plan').innerHTML = planHTML;
+
+            // NOUVELLE SECTION : CARTE DÉTAILLÉE DES MASQUES
+            let detailHTML = '';
+
+            Object.keys(questionnaire).forEach(maskKey => {
+                const mask = questionnaire[maskKey];
+                const score = scores[maskKey];
+                const level = getScoreLevel(score);
+
+                // Identifier les items critiques (3-4) et ressources (0-1)
+                let criticalItems = [];
+                let resourceItems = [];
+
+                mask.items.forEach(item => {
+                    if (responses[item.id]) {
+                        let finalValue = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            finalValue = 4 - finalValue;
+                        }
+
+                        if (finalValue >= 3) {
+                            criticalItems.push({id: item.id, text: item.text, value: finalValue});
+                        }
+                        if (finalValue <= 1) {
+                            resourceItems.push({id: item.id, text: item.text, value: finalValue});
+                        }
+                    }
+                });
+
+                // Analyse contextuelle basée sur les items critiques
+                let contextsHTML = analyzeContexts(maskKey, criticalItems);
+                let impactHTML = analyzeImpact(maskKey, criticalItems);
+                let mechanismsHTML = analyzeMechanisms(maskKey, criticalItems);
+
+                detailHTML += `
+                    <div style="margin-bottom: 40px; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 6px solid ${level.color};">
+
+                        <!-- En-tête du masque -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div>
+                                <h3 style="color: ${level.color}; font-size: 1.8em; margin-bottom: 5px;">${mask.name}</h3>
+                                <p style="color: #666; font-size: 0.95em;">Peur primale : ${mask.fear}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 3em; font-weight: bold; color: ${level.color};">${score}/64</div>
+                                <div style="font-size: 1.2em; font-weight: 600; color: ${level.color};">${level.level}</div>
+                            </div>
+                        </div>
+
+                        <!-- Niveau d'emprise -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="color: #333; margin-bottom: 10px;">📊 Niveau d'emprise</h4>
+                            <p style="color: #666; line-height: 1.6;">${getMaskInterpretation(maskKey, score)}</p>
+                            <div style="margin-top: 10px;">
+                                <strong>Intensité :</strong> ${criticalItems.length} item(s) à activation élevée (3-4) sur ${mask.items.length}
+                            </div>
+                        </div>
+
+                        <!-- Contextes d'activation -->
+                        ${criticalItems.length > 0 ? `
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                            <h4 style="color: #856404; margin-bottom: 15px;">⚠️ Contextes d'activation majeure</h4>
+                            ${contextsHTML}
+                        </div>
+                        ` : ''}
+
+                        <!-- Réponses critiques détaillées -->
+                        ${criticalItems.length > 0 ? `
+                        <div style="background: #f8d7da; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc3545;">
+                            <h4 style="color: #721c24; margin-bottom: 15px;">🚨 Manifestations concrètes (Items critiques)</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                ${criticalItems.map(item => `
+                                    <li style="margin-bottom: 12px; color: #721c24;">
+                                        <strong>${item.id}</strong> (score: ${item.value}/4) : ${item.text}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+
+                        <!-- Mécanismes défensifs -->
+                        ${mechanismsHTML}
+
+                        <!-- Impact sur la vie -->
+                        ${impactHTML}
+
+                        <!-- Ressources disponibles -->
+                        ${resourceItems.length > 0 ? `
+                        <div style="background: #d4edda; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                            <h4 style="color: #155724; margin-bottom: 15px;">💪 Ressources à mobiliser</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                ${resourceItems.map(item => `
+                                    <li style="margin-bottom: 10px; color: #155724;">
+                                        <strong>${item.id}</strong> : ${item.text}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <p style="margin-top: 15px; color: #155724; font-style: italic;">
+                                Ces capacités préservées constituent des leviers thérapeutiques précieux pour transcender ce masque.
+                            </p>
+                        </div>
+                        ` : `
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="color: #856404; margin: 0;">
+                                ⚠️ Peu de ressources identifiées sur ce masque - cela suggère une activation généralisée nécessitant un travail thérapeutique approfondi.
+                            </p>
+                        </div>
+                        `}
+
+                    </div>
+                `;
+            });
+
+            document.getElementById('detailed-interpretations').innerHTML = detailHTML;
+
+            // FONCTIONS D'ANALYSE CONTEXTUELLE
+
+            function analyzeContexts(maskKey, criticalItems) {
+                if (criticalItems.length === 0) return '';
+
+                const contexts = {
+                    red: {
+                        high: "Le masque s'active particulièrement lors de sensations corporelles inhabituelles, consultations médicales, ou exposition à des informations sur la santé. L'hypervigilance somatique est constante.",
+                        moderate: "Le masque se manifeste surtout en présence de symptômes physiques ou dans des situations de stress où le corps est sollicité."
+                    },
+                    orange: {
+                        high: "Le masque domine dans les situations d'intimité émotionnelle, lors d'expressions affectives d'autrui, ou face à ses propres ressentis. La dissociation affective est quasi-permanente.",
+                        moderate: "Le masque se manifeste principalement dans les contextes relationnels chargés émotionnellement ou lors de confrontation à ses propres émotions."
+                    },
+                    yellow: {
+                        high: "Le masque s'active face à toute forme d'imprévu, d'incertitude ou de changement. Le besoin de contrôle et de prévisibilité envahit tous les domaines de vie.",
+                        moderate: "Le masque se manifeste surtout lors de situations nouvelles, de prises de décision, ou face à des événements non planifiés."
+                    },
+                    green: {
+                        high: "Le masque domine dans toutes les interactions sociales, particulièrement lors de désaccords, de solitude, ou face au risque de rejet. L'adaptation à autrui est systématique.",
+                        moderate: "Le masque se manifeste surtout dans les relations significatives, lors d'affirmation de soi, ou en situation de conflit potentiel."
+                    },
+                    blue: {
+                        high: "Le masque s'active dès qu'autrui exerce un contrôle, lors de délégation, ou face à l'imprévu. Le besoin de maîtrise et de domination est omniprésent.",
+                        moderate: "Le masque se manifeste principalement dans les situations où le contrôle est partagé ou contesté, et lors de dépendance à autrui."
+                    },
+                    indigo: {
+                        high: "Le masque domine dans toute situation d'évaluation, de performance, ou de visibilité sociale. Le perfectionnisme et le doute paralysent l'action.",
+                        moderate: "Le masque se manifeste surtout lors de nouveaux défis, de projets importants, ou face au regard d'autrui sur ses compétences."
+                    },
+                    violet: {
+                        high: "Le masque envahit tous les domaines : confusion identitaire profonde, vie en mode automatique, perte de sens existentiel. L'aliénation est majeure.",
+                        moderate: "Le masque se manifeste lors de moments de solitude, de questionnements identitaires, ou face à des choix de vie importants."
+                    }
+                };
+
+                const level = criticalItems.length >= 5 ? 'high' : 'moderate';
+                return `<p style="color: #856404; line-height: 1.6; margin: 0;">${contexts[maskKey][level]}</p>`;
+            }
+
+            function analyzeMechanisms(maskKey, criticalItems) {
+                if (criticalItems.length === 0) return '';
+
+                const mechanisms = {
+                    red: "Hypervigilance corporelle • Évitement d'activités physiques • Recherche compulsive de réassurance médicale • Catastrophisme sanitaire",
+                    orange: "Intellectualisation • Distraction compulsive • Minimisation émotionnelle • Déconnexion psychocorporelle • Fuite relationnelle",
+                    yellow: "Planification excessive • Vérifications compulsives • Rigidification des routines • Anticipation anxieuse • Besoin d'information exhaustive",
+                    green: "Sur-adaptation relationnelle • Effacement de soi • Recherche de réassurance affective • Hypervigilance au rejet • Sacrifice de ses besoins",
+                    blue: "Hypercontrôle • Refus de délégation • Irritabilité face à l'imprévu • Domination relationnelle • Intolérance à la dépendance",
+                    indigo: "Procrastination paralysante • Auto-sabotage • Évitement de défis • Surinvestissement perfectionniste • Comparaison sociale constante",
+                    violet: "Conformisme social excessif • Répression identitaire • Fonctionnement automatique • Évitement introspectif • Rigidification du self"
+                };
+
+                return `
+                    <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff;">
+                        <h4 style="color: #004085; margin-bottom: 10px;">🔄 Mécanismes défensifs actifs</h4>
+                        <p style="color: #004085; margin: 0; line-height: 1.6;">${mechanisms[maskKey]}</p>
+                    </div>
+                `;
+            }
+
+            function analyzeImpact(maskKey, criticalItems) {
+                if (criticalItems.length === 0) return '';
+
+                const impacts = {
+                    red: {
+                        relationnel: "Dépendance aux proches pour réassurance • Évitement d'activités sociales par peur • Isolement progressif",
+                        professionnel: "Absentéisme lié à la santé • Difficultés de concentration • Consultations médicales fréquentes",
+                        quotidien: "Restriction des activités physiques • Surinvestissement dans la surveillance corporelle • Sommeil perturbé"
+                    },
+                    orange: {
+                        relationnel: "Froideur émotionnelle perçue • Difficultés d'intimité • Incompréhension mutuelle • Relations superficielles",
+                        professionnel: "Communication factuelle uniquement • Évitement des feedbacks émotionnels • Leadership distant",
+                        quotidien: "Surinvestissement dans l'action • Anesthésie par le travail/substances • Vide intérieur"
+                    },
+                    yellow: {
+                        relationnel: "Rigidité dans les interactions • Difficulté avec la spontanéité • Contrôle des activités communes",
+                        professionnel: "Lenteur décisionnelle • Inflexibilité • Stress face aux changements organisationnels",
+                        quotidien: "Surcharge mentale par anticipation • Épuisement cognitif • Vie routinière sans plaisir"
+                    },
+                    green: {
+                        relationnel: "Déséquilibre donneur/receveur • Relations asymétriques • Difficulté à poser limites • Dépendance affective",
+                        professionnel: "Difficulté à refuser • Surcharge de travail • Évitement des conflits • Manque d'assertivité",
+                        quotidien: "Sacrifice de ses besoins • Anxiété relationnelle constante • Solitude vécue comme menace"
+                    },
+                    blue: {
+                        relationnel: "Conflits fréquents • Difficulté de collaboration • Relations tendues • Autoritarisme perçu",
+                        professionnel: "Micromanagement • Épuisement de l'équipe • Difficulté à déléguer • Conflits hiérarchiques",
+                        quotidien: "Irritabilité chronique • Fatigue liée au contrôle • Relations familiales tendues"
+                    },
+                    indigo: {
+                        relationnel: "Comparaison sociale constante • Évitement de visibilité • Syndrome de l'imposteur relationnel",
+                        professionnel: "Procrastination paralysante • Sous-réalisation • Refus d'opportunités • Surinvestissement improductif",
+                        quotidien: "Autocritique sévère • Insatisfaction chronique • Évitement de nouveautés"
+                    },
+                    violet: {
+                        relationnel: "Sentiment de fausseté • Distance avec soi • Relations basées sur des rôles • Inauthenticité",
+                        professionnel: "Fonctionnement mécanique • Perte de sens • Démotivation profonde • Questionnement existentiel",
+                        quotidien: "Vie en mode automatique • Absence de plaisir • Nostalgie du 'vrai soi' • Crise existentielle"
+                    }
+                };
+
+                const impact = impacts[maskKey];
+                return `
+                    <div style="background: #f3e5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #9c27b0;">
+                        <h4 style="color: #4a148c; margin-bottom: 15px;">💥 Impact sur la vie quotidienne</h4>
+                        <div style="margin-bottom: 12px;">
+                            <strong style="color: #4a148c;">Sur le plan relationnel :</strong>
+                            <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.relationnel}</p>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong style="color: #4a148c;">Sur le plan professionnel :</strong>
+                            <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.professionnel}</p>
+                        </div>
+                        <div>
+                            <strong style="color: #4a148c;">Dans le quotidien :</strong>
+                            <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.quotidien}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+
+            document.getElementById('result-date').textContent = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            showSection('results');
+            window.scrollTo(0, 0);
+        }
+
+        function exportJSON() {
+            const data = {
+                prenom: document.getElementById('prenom').value,
+                age: document.getElementById('age').value,
+                genre: document.getElementById('genre').value,
+                situation: document.getElementById('situation').value,
+                attachement: document.getElementById('attachement').value,
+                date: new Date().toISOString(),
+                responses: responses,
+                scores: calculateScores()
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `masques-resultats-${new Date().getTime()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetQuestionnaire() {
+            if (confirm('Êtes-vous sûr de vouloir recommencer ? Toutes vos réponses seront effacées.')) {
+                responses = {};
+                document.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
+                document.querySelector('.progress-fill').style.width = '0%';
+                document.getElementById('prenom').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('genre').value = '';
+                document.getElementById('situation').value = '';
+                document.getElementById('attachement').value = '';
+                showSection('welcome');
+                window.scrollTo(0, 0);
+            }
+        }
+        function analyzeContexts(maskKey, criticalItems) {
+            if (criticalItems.length === 0) return '';
+
+            const contexts = {
+                red: {
+                    high: "Le masque s'active particulièrement lors de sensations corporelles inhabituelles, consultations médicales, ou exposition à des informations sur la santé. L'hypervigilance somatique est constante.",
+                    moderate: "Le masque se manifeste surtout en présence de symptômes physiques ou dans des situations de stress où le corps est sollicité."
+                },
+                orange: {
+                    high: "Le masque domine dans les situations d'intimité émotionnelle, lors d'expressions affectives d'autrui, ou face à ses propres ressentis. La dissociation affective est quasi-permanente.",
+                    moderate: "Le masque se manifeste principalement dans les contextes relationnels chargés émotionnellement ou lors de confrontation à ses propres émotions."
+                },
+                yellow: {
+                    high: "Le masque s'active face à toute forme d'imprévu, d'incertitude ou de changement. Le besoin de contrôle et de prévisibilité envahit tous les domaines de vie.",
+                    moderate: "Le masque se manifeste surtout lors de situations nouvelles, de prises de décision, ou face à des événements non planifiés."
+                },
+                green: {
+                    high: "Le masque domine dans toutes les interactions sociales, particulièrement lors de désaccords, de solitude, ou face au risque de rejet. L'adaptation à autrui est systématique.",
+                    moderate: "Le masque se manifeste surtout dans les relations significatives, lors d'affirmation de soi, ou en situation de conflit potentiel."
+                },
+                blue: {
+                    high: "Le masque s'active dès qu'autrui exerce un contrôle, lors de délégation, ou face à l'imprévu. Le besoin de maîtrise et de domination est omniprésent.",
+                    moderate: "Le masque se manifeste principalement dans les situations où le contrôle est partagé ou contesté, et lors de dépendance à autrui."
+                },
+                indigo: {
+                    high: "Le masque domine dans toute situation d'évaluation, de performance, ou de visibilité sociale. Le perfectionnisme et le doute paralysent l'action.",
+                    moderate: "Le masque se manifeste surtout lors de nouveaux défis, de projets importants, ou face au regard d'autrui sur ses compétences."
+                },
+                violet: {
+                    high: "Le masque envahit tous les domaines : confusion identitaire profonde, vie en mode automatique, perte de sens existentiel. L'aliénation est majeure.",
+                    moderate: "Le masque se manifeste lors de moments de solitude, de questionnements identitaires, ou face à des choix de vie importants."
+                }
+            };
+
+            const level = criticalItems.length >= 5 ? 'high' : 'moderate';
+            return `<p style="color: #856404; line-height: 1.6; margin: 0;">${contexts[maskKey][level]}</p>`;
+        }
+
+        function analyzeMechanisms(maskKey, criticalItems) {
+            if (criticalItems.length === 0) return '';
+
+            const mechanisms = {
+                red: "Hypervigilance corporelle • Évitement d'activités physiques • Recherche compulsive de réassurance médicale • Catastrophisme sanitaire",
+                orange: "Intellectualisation • Distraction compulsive • Minimisation émotionnelle • Déconnexion psychocorporelle • Fuite relationnelle",
+                yellow: "Planification excessive • Vérifications compulsives • Rigidification des routines • Anticipation anxieuse • Besoin d'information exhaustive",
+                green: "Sur-adaptation relationnelle • Effacement de soi • Recherche de réassurance affective • Hypervigilance au rejet • Sacrifice de ses besoins",
+                blue: "Hypercontrôle • Refus de délégation • Irritabilité face à l'imprévu • Domination relationnelle • Intolérance à la dépendance",
+                indigo: "Procrastination paralysante • Auto-sabotage • Évitement de défis • Surinvestissement perfectionniste • Comparaison sociale constante",
+                violet: "Conformisme social excessif • Répression identitaire • Fonctionnement automatique • Évitement introspectif • Rigidification du self"
+            };
+
+            return `
+                <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff;">
+                    <h4 style="color: #004085; margin-bottom: 10px;">🔄 Mécanismes défensifs actifs</h4>
+                    <p style="color: #004085; margin: 0; line-height: 1.6;">${mechanisms[maskKey]}</p>
+                </div>
+            `;
+        }
+
+        function analyzeImpact(maskKey, criticalItems) {
+            if (criticalItems.length === 0) return '';
+
+            const impacts = {
+                red: {
+                    relationnel: "Dépendance aux proches pour réassurance • Évitement d'activités sociales par peur • Isolement progressif",
+                    professionnel: "Absentéisme lié à la santé • Difficultés de concentration • Consultations médicales fréquentes",
+                    quotidien: "Restriction des activités physiques • Surinvestissement dans la surveillance corporelle • Sommeil perturbé"
+                },
+                orange: {
+                    relationnel: "Froideur émotionnelle perçue • Difficultés d'intimité • Incompréhension mutuelle • Relations superficielles",
+                    professionnel: "Communication factuelle uniquement • Évitement des feedbacks émotionnels • Leadership distant",
+                    quotidien: "Surinvestissement dans l'action • Anesthésie par le travail/substances • Vide intérieur"
+                },
+                yellow: {
+                    relationnel: "Rigidité dans les interactions • Difficulté avec la spontanéité • Contrôle des activités communes",
+                    professionnel: "Lenteur décisionnelle • Inflexibilité • Stress face aux changements organisationnels",
+                    quotidien: "Surcharge mentale par anticipation • Épuisement cognitif • Vie routinière sans plaisir"
+                },
+                green: {
+                    relationnel: "Déséquilibre donneur/receveur • Relations asymétriques • Difficulté à poser limites • Dépendance affective",
+                    professionnel: "Difficulté à refuser • Surcharge de travail • Évitement des conflits • Manque d'assertivité",
+                    quotidien: "Sacrifice de ses besoins • Anxiété relationnelle constante • Solitude vécue comme menace"
+                },
+                blue: {
+                    relationnel: "Conflits fréquents • Difficulté de collaboration • Relations tendues • Autoritarisme perçu",
+                    professionnel: "Micromanagement • Épuisement de l'équipe • Difficulté à déléguer • Conflits hiérarchiques",
+                    quotidien: "Irritabilité chronique • Fatigue liée au contrôle • Relations familiales tendues"
+                },
+                indigo: {
+                    relationnel: "Comparaison sociale constante • Évitement de visibilité • Syndrome de l'imposteur relationnel",
+                    professionnel: "Procrastination paralysante • Sous-réalisation • Refus d'opportunités • Surinvestissement improductif",
+                    quotidien: "Autocritique sévère • Insatisfaction chronique • Évitement de nouveautés"
+                },
+                violet: {
+                    relationnel: "Sentiment de fausseté • Distance avec soi • Relations basées sur des rôles • Inauthenticité",
+                    professionnel: "Fonctionnement mécanique • Perte de sens • Démotivation profonde • Questionnement existentiel",
+                    quotidien: "Vie en mode automatique • Absence de plaisir • Nostalgie du 'vrai soi' • Crise existentielle"
+                }
+            };
+
+            const impact = impacts[maskKey];
+            return `
+                <div style="background: #f3e5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #9c27b0;">
+                    <h4 style="color: #4a148c; margin-bottom: 15px;">💥 Impact sur la vie quotidienne</h4>
+                    <div style="margin-bottom: 12px;">
+                        <strong style="color: #4a148c;">Sur le plan relationnel :</strong>
+                        <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.relationnel}</p>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong style="color: #4a148c;">Sur le plan professionnel :</strong>
+                        <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.professionnel}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #4a148c;">Dans le quotidien :</strong>
+                        <p style="color: #6a1b9a; margin: 5px 0 0 0;">${impact.quotidien}</p>
+                    </div>
+                </div>
+            `;
+        }
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const prenom = document.getElementById('prenom').value;
+            const age = document.getElementById('age').value;
+            const genre = document.getElementById('genre').value;
+            const situation = document.getElementById('situation').value;
+            const attachement = document.getElementById('attachement').value;
+            const scores = calculateScores();
+            const date = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let yPos = 20;
+            const pageHeight = 297;
+            const margin = 20;
+            const lineHeight = 7;
+
+            // Fonction pour ajouter une nouvelle page si nécessaire
+            function checkPageBreak(neededSpace = 10) {
+                if (yPos + neededSpace > pageHeight - margin) {
+                    doc.addPage();
+                    yPos = margin;
+                }
+            }
+
+            // En-tête
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('QUESTIONNAIRE V.A.L.E.U.R©', 105, yPos, { align: 'center' });
+            yPos += 10;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Rapport d\'analyse des masques psychologiques', 105, yPos, { align: 'center' });
+            yPos += 5;
+            doc.text(date, 105, yPos, { align: 'center' });
+            yPos += 15;
+
+            // Informations patient
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('INFORMATIONS PATIENT', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Prénom/Initiales : ' + prenom, margin, yPos);
+            yPos += 6;
+            doc.text('Âge : ' + age, margin, yPos);
+            yPos += 6;
+            doc.text('Genre : ' + genre, margin, yPos);
+            yPos += 6;
+            doc.text('Situation professionnelle : ' + situation, margin, yPos);
+            yPos += 6;
+            doc.text('Style d\'attachement : ' + attachement, margin, yPos);
+            yPos += 12;
+
+            // Scores globaux
+            checkPageBreak(60);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('SCORES PAR MASQUE', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+
+            const globalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+            doc.text('Score global : ' + globalScore + '/448', margin, yPos);
+            yPos += 8;
+
+            Object.keys(questionnaire).forEach(maskKey => {
+                const mask = questionnaire[maskKey];
+                const score = scores[maskKey];
+                const level = getScoreLevel(score);
+
+                checkPageBreak(8);
+                doc.setFont(undefined, 'bold');
+                doc.text(mask.name + ' : ' + score + '/64', margin, yPos);
+                doc.setFont(undefined, 'normal');
+                doc.text('(' + level.level + ')', margin + 70, yPos);
+                yPos += 6;
+            });
+
+            yPos += 10;
+
+            // Masque dominant
+            checkPageBreak(20);
+            const dominant = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('MASQUE DOMINANT', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(questionnaire[dominant].name, margin, yPos);
+            yPos += 6;
+            doc.text('Peur primale : ' + questionnaire[dominant].fear, margin, yPos);
+            yPos += 12;
+
+            // Items critiques
+            checkPageBreak(30);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('ITEMS CRITIQUES (Score 4 - Très souvent)', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+
+            let criticalCount = 0;
+            Object.keys(questionnaire).forEach(maskKey => {
+                questionnaire[maskKey].items.forEach(item => {
+                    if (responses[item.id]) {
+                        let finalValue = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            finalValue = 4 - finalValue;
+                        }
+                        if (finalValue === 4) {
+                            checkPageBreak(12);
+                            doc.setFont(undefined, 'bold');
+                            doc.text(item.id, margin, yPos);
+                            doc.setFont(undefined, 'normal');
+
+                            const textLines = doc.splitTextToSize(item.text, 160);
+                            doc.text(textLines, margin + 15, yPos);
+                            yPos += textLines.length * 5 + 3;
+                            criticalCount++;
+                        }
+                    }
+                });
+            });
+
+            if (criticalCount === 0) {
+                doc.text('Aucun item à score maximal identifié', margin, yPos);
+                yPos += 8;
+            }
+
+            yPos += 10;
+
+            // Ressources
+            checkPageBreak(30);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('RESSOURCES IDENTIFIEES (Score 0 - Jamais)', margin, yPos);
+            yPos += 8;
+
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+
+            let resourceCount = 0;
+            Object.keys(questionnaire).forEach(maskKey => {
+                questionnaire[maskKey].items.forEach(item => {
+                    if (responses[item.id]) {
+                        let finalValue = responses[item.id].value;
+                        if (responses[item.id].inverted) {
+                            finalValue = 4 - finalValue;
+                        }
+                        if (finalValue === 0) {
+                            checkPageBreak(12);
+                            doc.setFont(undefined, 'bold');
+                            doc.text(item.id, margin, yPos);
+                            doc.setFont(undefined, 'normal');
+
+                            const textLines = doc.splitTextToSize(item.text, 160);
+                            doc.text(textLines, margin + 15, yPos);
+                            yPos += textLines.length * 5 + 3;
+                            resourceCount++;
+                        }
+                    }
+                });
+            });
+
+            if (resourceCount === 0) {
+                doc.text('Peu de ressources identifiées', margin, yPos);
+                yPos += 8;
+            }
+
+            // Pied de page sur toutes les pages
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'italic');
+                doc.text('Questionnaire V.A.L.E.U.R© - Page ' + i + '/' + pageCount, 105, 285, { align: 'center' });
+                doc.text('Document confidentiel - Usage thérapeutique uniquement', 105, 290, { align: 'center' });
+            }
+
+            // Télécharger le PDF
+            doc.save('Questionnaire-VALEUR-' + prenom + '-' + new Date().getTime() + '.pdf');
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeQuestionnaire);
+
+        document.addEventListener('DOMContentLoaded', initializeQuestionnaire);
+            </script>
+        </body>
+        </html>
+
+
+
+
+
+	Sans virus.www.avg.com
